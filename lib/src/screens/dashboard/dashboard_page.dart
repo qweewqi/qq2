@@ -27,6 +27,7 @@ import 'package:cake_wallet/router.dart';
 import 'package:cake_wallet/buy/moonpay/moonpay_buy_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cake_wallet/wallet_type_utils.dart';
+import 'package:cake_wallet/src/screens/release_notes/release_notes_screen.dart';
 
 class DashboardPage extends BasePage {
   DashboardPage({
@@ -335,5 +336,16 @@ class DashboardPage extends BasePage {
       default:
         await Navigator.of(context).pushNamed(Routes.exchange);
     }
+  }
+
+  void _release(BuildContext context) async {
+    autorun((_) async {
+      await Future<void>.delayed(Duration(seconds: 1));
+      await showPopUp<void>(
+          context: context,
+          builder: (BuildContext context) {
+            return ReleaseNotesScreen();
+          });
+    });
   }
 }

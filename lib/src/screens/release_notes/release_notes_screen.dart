@@ -6,6 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:cake_wallet/palette.dart';
 
 class ReleaseNotesScreen extends StatefulWidget {
+  ReleaseNotesScreen({
+    @required this.title,
+  });
+
+  final String title;
+
   @override
   _ReleaseNotesScreenState createState() => _ReleaseNotesScreenState();
 }
@@ -105,7 +111,7 @@ class _ReleaseNotesScreenState extends State<ReleaseNotesScreen> {
                                   .accentTextTheme
                                   .display3
                                   .backgroundColor),
-                          child: Text('Version'),
+                          child: Text(widget.title),
                         ),
                       ),
                     ),

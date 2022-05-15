@@ -245,6 +245,18 @@ class DashboardPage extends BasePage {
           });
     });
 
+    autorun((_) async {
+      if (walletViewModel.settingsStore.appVersion=='4.4.1') {
+        return;
+      }
+      await Future<void>.delayed(Duration(seconds: 1));
+      await showPopUp<void>(
+          context: context,
+          builder: (BuildContext context) {
+            return ReleaseNotesScreen(title: 'Version ${walletViewModel.settingsStore.appVersion}');
+          });
+    });
+
     var needToPresentYat = false;
     var isInactive = false;
 
@@ -336,16 +348,5 @@ class DashboardPage extends BasePage {
       default:
         await Navigator.of(context).pushNamed(Routes.exchange);
     }
-  }
-
-  void _release(BuildContext context) async {
-    autorun((_) async {
-      await Future<void>.delayed(Duration(seconds: 1));
-      await showPopUp<void>(
-          context: context,
-          builder: (BuildContext context) {
-            return ReleaseNotesScreen();
-          });
-    });
   }
 }

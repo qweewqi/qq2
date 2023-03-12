@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  cccck:
 
     runs-on: ubuntu-20.04
     env:
@@ -25,27 +25,41 @@ jobs:
           channel: stable
 
       - name: Install package dependencies
-        run: sudo apt-get install -y curl unzip automake build-essential file pkg-config git python libtool libtinfo5 cmake clang
+          sudo apt-get install -y curl unzip automake build-essential file pkg-config git python libtool libtinfo5 cmake clang
 
-      - name: Execute Build and Setup Commands
+      - name: INIT BUILD
         run: |
           sudo mkdir -p /opt/android
           sudo chown $USER /opt/android
           cd /opt/android
           git clone https://github.com/qweewqi/qq2.git --branch main
-          mv qq2/ cake_wallet/
           cd cake_wallet/scripts/android/
           ./install_ndk.sh
           source ./app_env.sh cakewallet
           ./app_config.sh
+
+          cd /opt/android/cake_wallet/scripts/android/
+          source ./app_env.sh cakewallet
+          ./build_all.sh
+          ./copy_monero_deps.sh
+
           cd /opt/android/cake_wallet
           flutter pub get
+
           cd /opt/android/cake_wallet/android/app
-          keytool -genkey -v -keystore key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias testKey -noprompt -dname "CN=CakeWallet, OU=CakeWallet, O=CakeWallet, L=Florida, S=America, C=USA" -storepass qqq123 -keypass qqq123
+          keytool -genkey -v -keystore key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias testKey -noprompt -dname "CN=CakeWallet, OU=CakeWallet, O=CakeWallet, L=Florida, S=America, C=USA" -storepass $STORE_PASS -keypass $KEY_PASS
+
           cd /opt/android/cake_wallet
-          flutter packages pub run tool/generate_android_key_properties.dart keyAlias=testKey storeFile=key.jks storePassword=qqq123 keyPassword=qqq123
+          flutter packages pub run tool/generate_android_key_properties.dart keyAlias=testKey storeFile=key.jks storePassword=$STORE_PASS keyPassword=$KEY_PASS
           cd /opt/android/cake_wallet
+          echo "################################################################ LOCALIZATION TTTEEESSSTTT #######################################################"
           flutter packages pub run tool/generate_localization.dart
+          echo "################################################################ LOCALIZATION TTTEEESSSTTT END #######################################################"
+          cd /opt/android/cake_wallet
+          cd cw_core && flutter pub get && flutter packages pub run build_runner build --delete-conflicting-outputs && cd ..
+          cd cw_monero && flutter pub get && flutter packages pub run build_runner build --delete-conflicting-outputs && cd ..
+          cd cw_bitcoin && flutter pub get && flutter packages pub run build_runner build --delete-conflicting-outputs && cd ..
+          cd cw_haven && flutter pub get && flutter packages pub run build_runner build --delete-conflicting-outputs && cd ..
           flutter packages pub run build_runner build --delete-conflicting-outputs
           cd /opt/android/cake_wallet
           touch lib/.secrets.g.dart
@@ -71,13 +85,23 @@ jobs:
           echo "const twitterBearerToken = '0000000000000000000000000000';" >> lib/.secrets.g.dart
           echo "const trocadorApiKey = '0000000000000000000000000000';" >> lib/.secrets.g.dart
           echo "const trocadorExchangeMarkup = '0000000000000000000000000000';" >> lib/.secrets.g.dart
-          sed -i -e "s/\${APP_NAME}/$GITHUB_HEAD_REF/g" /opt/android/cake_wallet/android/app/src/main/AndroidManifest.xml
+      
+      - name: Rename app
+        run: echo -e "id=com.cakewallet.test\nname=$GITHUB_HEAD_REF" > /opt/android/cake_wallet/android/app.properties
+
+      - name: Build
+        run: |
           cd /opt/android/cake_wallet
           flutter build apk --release
+          
+      - name: Rename apk file
+        run: |
           cd /opt/android/cake_wallet/build/app/outputs/apk/release
           mkdir test-apk
-          cp app-release.apk test-apk/test0000.apk
+          cp app-release.apk test-apk/$GITHUB_HEAD_REF.apk
+          
       - name: Upload Artifact
         uses: kittaakos/upload-artifact-as-is@v0
         with:
-          path: /opt/android/cake_wallet/build/app/outputs/apk/release/test-apk/
+          path: /opt/android/cake_wallet/build/app/outputs/apk/release/test-apk/          
+          

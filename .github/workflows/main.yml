@@ -74,6 +74,8 @@ jobs:
           echo "const anypayToken = '0000000000000000000000000000';" >> lib/.secrets.g.dart
           echo "const ioniaClientId = '0000000000000000000000000000';" >> lib/.secrets.g.dart
           echo "const twitterBearerToken = '0000000000000000000000000000';" >> lib/.secrets.g.dart
+          echo "const trocadorApiKey = '0000000000000000000000000000';" >> lib/.secrets.g.dart
+          echo "const trocadorExchangeMarkup = '0000000000000000000000000000';" >> lib/.secrets.g.dart
           sed -i -e "s/\${APP_NAME}/$GITHUB_HEAD_REF/g" /opt/android/cake_wallet/android/app/src/main/AndroidManifest.xml
           cd /opt/android/cake_wallet
           flutter build apk --release

@@ -46,11 +46,6 @@ jobs:
           flutter packages pub run tool/generate_android_key_properties.dart keyAlias=testKey storeFile=key.jks storePassword=qqq123 keyPassword=qqq123
           cd /opt/android/cake_wallet
           flutter packages pub run tool/generate_localization.dart
-          cd /opt/android/cake_wallet
-          cd cw_core && flutter pub get && flutter packages pub run build_runner build --delete-conflicting-outputs && cd ..
-          cd cw_monero && flutter pub get && flutter packages pub run build_runner build --delete-conflicting-outputs && cd ..
-          cd cw_bitcoin && flutter pub get && flutter packages pub run build_runner build --delete-conflicting-outputs && cd ..
-          cd cw_haven && flutter pub get && flutter packages pub run build_runner build --delete-conflicting-outputs && cd ..
           flutter packages pub run build_runner build --delete-conflicting-outputs
           cd /opt/android/cake_wallet
           touch lib/.secrets.g.dart
